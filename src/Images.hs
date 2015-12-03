@@ -70,34 +70,11 @@ instance Show (Image Pixel8) where
    show x = ""
 
 instance Arbitrary (Image PixelRGBA8) where
-  arbitrary = do
-    Positive size <- arbitrary :: Gen (Positive Int)
-    pixs          <- listOfSize size
-    Positive w    <- arbitrary :: Gen (Positive Int)
-    let w' = w `rem` size-1
-    return Image { imageWidth  = w'
-                 , imageHeight = w' `div` size-1
-                 , imageData   = VS.fromList pixs
-                 }
-
-listOfSize :: Int → Gen [Word8]
-listOfSize x = fmap concat $ replicateM x genPixel
-
-genPixel :: Gen [Word8]
-genPixel = do
-     a <- arbitrary :: Gen Word8
-     b <- arbitrary :: Gen Word8
-     c <- arbitrary :: Gen Word8
-     d <- arbitrary :: Gen Word8
-     return [a,b,c,d]
-
-instance Arbitrary PixelRGBA8 where
-  arbitrary = do
-    r <- arbitrary :: Gen Word8
-    g <- arbitrary :: Gen Word8
-    b <- arbitrary :: Gen Word8
-    a <- arbitrary :: Gen Word8
-    return $ PixelRGBA8 r g b a
+   arbitrary = do
+       xs <- infiniteListOf (arbitrary :: Gen Word8)
+       Positive w <- (arbitrary :: Gen (Positive Int))
+       Positive h <- (arbitrary :: Gen (Positive Int))
+       return $ Image { imageWidth = w, imageHeight = h, imageData = VS.fromList (take (4*w*h) xs) }
 
 instance Show (Image PixelRGBA8) where
    show x = ""
