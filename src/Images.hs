@@ -51,10 +51,13 @@ instance Show (Image PixelCMYK16) where
 
 instance Arbitrary (Image PixelRGB8) where
    arbitrary = do
-       l <- listOf (arbitrary :: Gen Word8)
+       xs <- infiniteListOf (arbitrary :: Gen Word8)
        Positive w <- (arbitrary :: Gen (Positive Int))
        Positive h <- (arbitrary :: Gen (Positive Int))
-       return $ Image { imageWidth = w, imageHeight = h, imageData = VS.fromList l }
+       return $ Image { imageWidth = w
+                      , imageHeight = h
+                      , imageData = VS.fromList $ take (3 * w * h) xs
+                      }
 
 instance Show (Image PixelRGB8) where
    show x = ""
